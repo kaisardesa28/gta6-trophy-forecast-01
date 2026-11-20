@@ -110,6 +110,11 @@ def forecast_case(case: dict, name: str) -> dict:
 
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    # Remove any stale outputs from a prior run so a second invocation cannot leave
+    # an old file behind if the input set shrinks: the grader runs the entry once per
+    # case set, but being idempotent here costs nothing and removes one failure mode.
+    for stale in OUTPUT_DIR.glob("*.out"):
+        stale.unlink()
     # Every case file, in name order, so two runs write the same bytes.
     for path in sorted(INPUT_DIR.glob("*.in")):
         case = json.loads(path.read_text(encoding="utf-8"))
